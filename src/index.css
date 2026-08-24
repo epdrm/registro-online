@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-bg: #ffffff;
+  --color-bg-section: #f6f9f7;
+  --color-green: #16794c;
+  --color-green-dark: #0f5138;
+  --color-green-soft: #e4f2ea;
+  --color-text: #191d1b;
+  --color-text-secondary: #5c6661;
+  --color-border: #e2e8e4;
+
+  --color-leve: #b98900;
+  --color-moderada: #c2601c;
+  --color-grave: #b3261e;
+  --color-positiva: #16794c;
+
+  --radius-card: 10px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg-section);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+/* Touch targets stay >=44px even when content is smaller (accessibility rule from design-system.md) */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
