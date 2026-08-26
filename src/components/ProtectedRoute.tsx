@@ -2,12 +2,14 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export function ProtectedRoute() {
-  const { usuario } = useAuth()
+  const { usuario, carregando } = useAuth()
+  if (carregando) return null
   if (!usuario) return <Navigate to="/login" replace />
   return <Outlet />
 }
 
 const PAGINA_INICIAL: Record<string, string> = {
+  admin: '/app/administracao',
   professor: '/app/meus-registros',
   professor_tecnico: '/app/meus-registros',
   professor_diretor: '/app/minha-turma',

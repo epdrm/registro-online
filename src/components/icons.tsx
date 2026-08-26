@@ -200,6 +200,16 @@ export function IconBarChart(props: IconProps) {
   )
 }
 
+export function IconUsers(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="9" cy="8.5" r="3" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M3.5 19c.6-3 2.6-4.8 5.5-4.8s4.9 1.8 5.5 4.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M15.5 5.3a3 3 0 0 1 0 5.9M17.8 19c-.4-2.1-1.4-3.6-3-4.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function IconInbox(props: IconProps) {
   return (
     <svg {...base(props)}>

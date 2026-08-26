@@ -57,7 +57,7 @@ export function NovoRegistroPage() {
     adicionarRegistro({
       alunoIds,
       turmaId,
-      disciplina: usuario.disciplina,
+      disciplina: usuario.disciplina ?? '',
       autorId: usuario.id,
       categoriaId,
       descricao: descricao.trim() || 'Sem descrição adicional.',

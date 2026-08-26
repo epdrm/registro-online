@@ -5,10 +5,11 @@ import { useData } from '../context/DataContext'
 import { Avatar } from './Avatar'
 import {
   IconBarChart, IconBell, IconClipboard, IconDocCheck, IconGrid,
-  IconLayers, IconLogout, IconMenu, IconPlus, IconX,
+  IconLayers, IconLogout, IconMenu, IconPlus, IconUsers, IconX,
 } from './icons'
 
 const ROTULO_PAPEL: Record<string, string> = {
+  admin: 'Administrador(a)',
   professor: 'Professor(a)',
   professor_tecnico: 'Professor(a) técnico(a)',
   professor_diretor: 'Professor(a)-diretor(a)',
@@ -18,7 +19,7 @@ const ROTULO_PAPEL: Record<string, string> = {
 }
 
 // Para esses papéis a disciplina cadastrada é só o nome do próprio papel — evita repetir.
-const OCULTAR_DISCIPLINA = new Set(['coordenacao_pedagogica', 'diretor'])
+const OCULTAR_DISCIPLINA = new Set(['admin', 'coordenacao_pedagogica', 'diretor'])
 
 interface NavItem {
   to: string
@@ -28,6 +29,10 @@ interface NavItem {
 }
 
 function navPorPapel(papel: string, naoLidas: number): NavItem[] {
+  if (papel === 'admin') {
+    return [{ to: '/app/administracao', label: 'Professores', icon: IconUsers }]
+  }
+
   const base: NavItem[] = [
     { to: '/app/novo-registro', label: 'Novo registro', icon: IconPlus },
     { to: '/app/meus-registros', label: 'Meus registros', icon: IconClipboard },
@@ -35,6 +40,7 @@ function navPorPapel(papel: string, naoLidas: number): NavItem[] {
 
   if (papel === 'professor_diretor') {
     base.push({ to: '/app/minha-turma', label: 'Minha turma', icon: IconLayers })
+    base.push({ to: '/app/administracao', label: 'Alunos', icon: IconUsers })
   }
   if (papel === 'professor_coordenador') {
     base.push({ to: '/app/meu-eixo', label: 'Meu eixo', icon: IconGrid })
@@ -174,13 +180,15 @@ export function AppShell({ children, titulo }: { children: ReactNode; titulo: st
                 <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full border border-bg bg-grave" />
               )}
             </NavLink>
-            <button
-              onClick={() => navigate('/app/novo-registro')}
-              className="tap-target flex items-center gap-2 rounded-lg bg-green px-3.5 text-sm font-semibold text-white hover:bg-green-dark sm:px-4"
-            >
-              <IconPlus size={16} />
-              <span className="hidden sm:inline">Novo registro</span>
-            </button>
+            {usuario.papel !== 'admin' && (
+              <button
+                onClick={() => navigate('/app/novo-registro')}
+                className="tap-target flex items-center gap-2 rounded-lg bg-green px-3.5 text-sm font-semibold text-white hover:bg-green-dark sm:px-4"
+              >
+                <IconPlus size={16} />
+                <span className="hidden sm:inline">Novo registro</span>
+              </button>
+            )}
           </div>
         </header>
 

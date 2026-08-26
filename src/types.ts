@@ -1,4 +1,5 @@
 export type Papel =
+  | 'admin'
   | 'professor'
   | 'professor_tecnico'
   | 'professor_diretor'
@@ -13,7 +14,7 @@ export interface Usuario {
   iniciais: string
   avatarColor: string
   papel: Papel
-  disciplina: string
+  disciplina?: string
   /** professor_diretor: turma pela qual é responsável */
   turmaResponsavelId?: string
   /** professor_coordenador: eixo que coordena */

@@ -1,26 +1,26 @@
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { USUARIOS_DEMO, useAuth } from '../context/AuthContext'
-import { Avatar } from '../components/Avatar'
+import { useAuth } from '../context/AuthContext'
 import { IconDocCheck } from '../components/icons'
 
-const ROTULO_PAPEL: Record<string, string> = {
-  professor: 'Professor(a)',
-  professor_tecnico: 'Professor(a) técnico(a)',
-  professor_diretor: 'Professor(a)-diretor(a)',
-  professor_coordenador: 'Professor(a) coordenador(a)',
-  coordenacao_pedagogica: 'Coordenação pedagógica',
-  diretor: 'Direção escolar',
-}
-
-// Para esses papéis a disciplina cadastrada é só o nome do próprio papel — evita repetir.
-const OCULTAR_DISCIPLINA = new Set(['coordenacao_pedagogica', 'diretor'])
-
 export function LoginPage() {
-  const { entrarComo } = useAuth()
+  const { entrar } = useAuth()
   const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [erro, setErro] = useState<string | null>(null)
+  const [enviando, setEnviando] = useState(false)
 
-  function entrar(usuarioId: string) {
-    entrarComo(usuarioId)
+  async function aoEnviar(evento: FormEvent) {
+    evento.preventDefault()
+    setErro(null)
+    setEnviando(true)
+    const resultado = await entrar(email.trim(), senha)
+    setEnviando(false)
+    if (resultado.erro) {
+      setErro(resultado.erro)
+      return
+    }
     navigate('/app')
   }
 
@@ -40,43 +40,62 @@ export function LoginPage() {
             <div className="text-2xl font-bold tracking-tight">
               Registro <span className="text-green">Online</span>
             </div>
-            <div className="text-sm text-text-secondary">Escola Técnica Estadual Vale Verde</div>
+            <div className="text-sm text-text-secondary">Sistema escolar de registro interno</div>
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-5 rounded-xl border border-border bg-bg p-7 shadow-[0_2px_10px_rgba(15,81,56,0.08)] sm:p-8">
+        <form
+          onSubmit={aoEnviar}
+          className="flex w-full flex-col gap-5 rounded-xl border border-border bg-bg p-7 shadow-[0_2px_10px_rgba(15,81,56,0.08)] sm:p-8"
+        >
           <div className="flex flex-col gap-1">
             <div className="text-lg font-bold">Entrar</div>
             <div className="text-[13.5px] text-text-secondary">
-              Protótipo de demonstração — escolha um usuário para explorar o que cada perfil enxerga.
+              Acesse com o e-mail e a senha cadastrados pela secretaria.
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            {USUARIOS_DEMO.map((usuario) => (
-              <button
-                key={usuario.id}
-                onClick={() => entrar(usuario.id)}
-                className="tap-target flex items-center gap-3 rounded-lg border border-border px-3.5 py-2.5 text-left transition-colors hover:border-green hover:bg-green-soft"
-              >
-                <Avatar iniciais={usuario.iniciais} cor={usuario.avatarColor} tamanho={36} />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13.5px] font-semibold">{usuario.nome}</div>
-                  <div className="truncate text-xs text-text-secondary">
-                    {ROTULO_PAPEL[usuario.papel]}{!OCULTAR_DISCIPLINA.has(usuario.papel) && ` · ${usuario.disciplina}`}
-                  </div>
-                </div>
-              </button>
-            ))}
+          <div className="flex flex-col gap-3.5">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[13px] font-semibold">E-mail</span>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="tap-target rounded-lg border border-border bg-bg px-3.5 text-[14px] outline-none focus:border-green"
+                placeholder="voce@email.com"
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[13px] font-semibold">Senha</span>
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                className="tap-target rounded-lg border border-border bg-bg px-3.5 text-[14px] outline-none focus:border-green"
+                placeholder="••••••••"
+              />
+            </label>
           </div>
 
-          <div className="h-px bg-border" />
+          {erro && (
+            <div className="rounded-lg border border-grave/30 bg-grave/10 px-3.5 py-2.5 text-[13.5px] text-grave">
+              {erro}
+            </div>
+          )}
 
-          <div className="text-center text-xs leading-relaxed text-text-secondary">
-            Em produção o acesso é vinculado ao cadastro na secretaria — o perfil já vem definido,
-            sem seleção manual.
-          </div>
-        </div>
+          <button
+            type="submit"
+            disabled={enviando}
+            className="tap-target flex items-center justify-center rounded-lg bg-green text-sm font-semibold text-white transition-colors hover:bg-green-dark disabled:opacity-60"
+          >
+            {enviando ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
 
         <div className="text-center text-xs leading-relaxed text-text-secondary">
           Uso restrito a servidores autorizados. Dados de ocorrências são tratados

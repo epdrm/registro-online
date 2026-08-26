@@ -8,6 +8,7 @@ import { PainelCoordenadorPage } from './pages/PainelCoordenadorPage'
 import { PainelDirecaoPage } from './pages/PainelDirecaoPage'
 import { PerfilAlunoPage } from './pages/PerfilAlunoPage'
 import { NotificacoesPage } from './pages/NotificacoesPage'
+import { AdministracaoPage } from './pages/AdministracaoPage'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/app/visao-geral" element={<PainelDirecaoPage />} />
         <Route path="/app/notificacoes" element={<NotificacoesPage />} />
         <Route path="/app/aluno/:alunoId" element={<PerfilAlunoPage />} />
+        <Route path="/app/administracao" element={<AdministracaoPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
