@@ -6,7 +6,7 @@ import { IconDocCheck } from '../components/icons'
 export function LoginPage() {
   const { entrar } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -15,7 +15,7 @@ export function LoginPage() {
     evento.preventDefault()
     setErro(null)
     setEnviando(true)
-    const resultado = await entrar(email.trim(), senha)
+    const resultado = await entrar(usuario.trim(), senha)
     setEnviando(false)
     if (resultado.erro) {
       setErro(resultado.erro)
@@ -51,21 +51,21 @@ export function LoginPage() {
           <div className="flex flex-col gap-1">
             <div className="text-lg font-bold">Entrar</div>
             <div className="text-[13.5px] text-text-secondary">
-              Acesse com o e-mail e a senha cadastrados pela secretaria.
+              Acesse com o usuário e a senha cadastrados pela secretaria.
             </div>
           </div>
 
           <div className="flex flex-col gap-3.5">
             <label className="flex flex-col gap-1.5">
-              <span className="text-[13px] font-semibold">E-mail</span>
+              <span className="text-[13px] font-semibold">Usuário</span>
               <input
-                type="email"
+                type="text"
                 required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
                 className="tap-target rounded-lg border border-border bg-bg px-3.5 text-[14px] outline-none focus:border-green"
-                placeholder="voce@email.com"
+                placeholder="seu.usuario"
               />
             </label>
             <label className="flex flex-col gap-1.5">

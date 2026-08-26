@@ -1,27 +1,48 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
+import { emailInterno } from '../lib/username'
 import type { Usuario } from '../types'
 
 interface AuthContextValue {
   usuario: Usuario | null
   carregando: boolean
-  entrar: (email: string, senha: string) => Promise<{ erro?: string }>
+  entrar: (usuario: string, senha: string) => Promise<{ erro?: string }>
   sair: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
+interface PerfilComDisciplinas {
+  id: string
+  nome: string
+  username: string
+  email: string
+  iniciais: string
+  avatar_color: string
+  papel: Usuario['papel']
+  turma_responsavel_id: string | null
+  eixo_coordenado_id: string | null
+  professor_disciplinas: { disciplinas: { nome: string } | null }[] | null
+}
+
 async function buscarPerfil(userId: string): Promise<Usuario | null> {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*, professor_disciplinas(disciplinas(nome))')
+    .eq('id', userId)
+    .maybeSingle<PerfilComDisciplinas>()
   if (error || !data) return null
   return {
     id: data.id,
     nome: data.nome,
+    username: data.username,
     email: data.email,
     iniciais: data.iniciais,
     avatarColor: data.avatar_color,
     papel: data.papel,
-    disciplina: data.disciplina ?? undefined,
+    disciplinas: (data.professor_disciplinas ?? [])
+      .map((pd) => pd.disciplinas?.nome)
+      .filter((nome): nome is string => !!nome),
     turmaResponsavelId: data.turma_responsavel_id ?? undefined,
     eixoCoordenadoId: data.eixo_coordenado_id ?? undefined,
   }
@@ -56,8 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue>(() => ({
     usuario,
     carregando,
-    entrar: async (email, senha) => {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
+    entrar: async (usuarioLogin, senha) => {
+      const { error } = await supabase.auth.signInWithPassword({ email: emailInterno(usuarioLogin), password: senha })
       if (error) return { erro: traduzirErro(error.message) }
       return {}
     },
@@ -76,7 +97,7 @@ export function useAuth(): AuthContextValue {
 }
 
 function traduzirErro(mensagem: string): string {
-  if (mensagem.includes('Invalid login credentials')) return 'E-mail ou senha incorretos.'
-  if (mensagem.includes('Email not confirmed')) return 'E-mail ainda não confirmado.'
+  if (mensagem.includes('Invalid login credentials')) return 'Usuário ou senha incorretos.'
+  if (mensagem.includes('Email not confirmed')) return 'Conta ainda não confirmada.'
   return 'Não foi possível entrar. Tente novamente.'
 }
