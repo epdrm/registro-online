@@ -1,29 +1,70 @@
-import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
 import { AppShell } from '../components/AppShell'
 import { Avatar } from '../components/Avatar'
 import { EmptyState } from '../components/EmptyState'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
-import { turmaPorId } from '../data/mockData'
-import { contagemPorCategoria, rankingAlunosDaTurma, registrosDaTurma, LIMIAR_ACUMULO } from '../data/selectors'
+import { supabase } from '../lib/supabase'
+import { contagemPorCategoria, pesoAcumuladoAluno, registrosDaTurma, statusPeso, LIMIAR_ACUMULO } from '../data/selectors'
 import { formatarDataHora } from '../utils/date'
 import { IconAlertTriangle, IconBell } from '../components/icons'
 
 const STATUS_LABEL: Record<string, string> = { grave: 'Alerta', moderada: 'Atenção', leve: 'Observar', ok: 'Normal' }
 const STATUS_COR: Record<string, string> = { grave: '#B3261E', moderada: '#C2601C', leve: '#B98900', ok: '#5C6661' }
 
+interface AlunoReal {
+  id: string
+  nome: string
+  iniciais: string
+  avatar_color: string
+}
+
+interface TurmaReal {
+  nome: string
+  cursos: { nome: string; eixos: { nome: string } | null } | null
+}
+
 export function PainelDiretorPage() {
   const { usuario } = useAuth()
   const { registros, notificacoes } = useData()
-  const navigate = useNavigate()
 
-  const turmaId = usuario?.turmaResponsavelId ?? 'ds-2'
-  const turma = turmaPorId(turmaId)
+  const turmaId = usuario?.turmaResponsavelId
+  const [turma, setTurma] = useState<TurmaReal | null>(null)
+  const [alunos, setAlunos] = useState<AlunoReal[]>([])
+  const [carregando, setCarregando] = useState(true)
 
-  const registrosDaMinhaTurma = useMemo(() => registrosDaTurma(turmaId, registros), [turmaId, registros])
+  useEffect(() => {
+    if (!turmaId) {
+      setCarregando(false)
+      return
+    }
+    let ativo = true
+    async function carregar() {
+      setCarregando(true)
+      const [{ data: turmaData }, { data: alunosData }] = await Promise.all([
+        supabase.from('series').select('nome, cursos(nome, eixos(nome))').eq('id', turmaId).maybeSingle<TurmaReal>(),
+        supabase.from('alunos').select('id, nome, iniciais, avatar_color').eq('turma_id', turmaId).order('nome'),
+      ])
+      if (ativo) {
+        setTurma(turmaData ?? null)
+        setAlunos((alunosData as AlunoReal[] | null) ?? [])
+        setCarregando(false)
+      }
+    }
+    carregar()
+    return () => { ativo = false }
+  }, [turmaId])
+
+  const registrosDaMinhaTurma = useMemo(() => (turmaId ? registrosDaTurma(turmaId, registros) : []), [turmaId, registros])
   const registrosDoMes = registrosDaMinhaTurma.filter((r) => Math.abs(new Date(r.dataHora).getTime() - Date.now()) < 40 * 24 * 60 * 60 * 1000)
-  const ranking = useMemo(() => rankingAlunosDaTurma(turmaId, registros), [turmaId, registros])
+
+  const ranking = useMemo(() => alunos
+    .map((aluno) => {
+      const peso = pesoAcumuladoAluno(aluno.id, registros)
+      return { aluno, peso, status: statusPeso(peso) }
+    })
+    .sort((a, b) => b.peso - a.peso), [alunos, registros])
+
   const categorias = useMemo(() => contagemPorCategoria(registrosDoMes), [registrosDoMes])
   const maiorCategoria = categorias[0]?.total ?? 1
   const maiorPeso = ranking[0]?.peso || 1
@@ -32,14 +73,43 @@ export function PainelDiretorPage() {
   const emAlerta = ranking.filter((r) => r.peso >= LIMIAR_ACUMULO)
   const alertasDaTurma = notificacoes.filter((n) => n.turmaId === turmaId).slice(0, 6)
 
-  if (!usuario || !turma) return null
+  if (!usuario) return null
+
+  if (!turmaId) {
+    return (
+      <AppShell titulo="Minha turma">
+        <div className="p-6 text-sm text-text-secondary">Nenhuma turma responsável vinculada à sua conta ainda — fale com a administração.</div>
+      </AppShell>
+    )
+  }
+
+  if (carregando) {
+    return (
+      <AppShell titulo="Minha turma">
+        <div className="p-6 text-sm text-text-secondary">Carregando…</div>
+      </AppShell>
+    )
+  }
+
+  if (!turma) {
+    return (
+      <AppShell titulo="Minha turma">
+        <div className="p-6 text-sm text-text-secondary">Turma não encontrada — pode ter sido removida do catálogo.</div>
+      </AppShell>
+    )
+  }
+
+  const rotuloTurma = [turma.nome, turma.cursos?.nome].filter(Boolean).join(' ')
 
   return (
     <AppShell titulo="Minha turma">
       <div className="flex flex-col gap-6 px-4 py-6 sm:px-7">
         <div>
-          <div className="text-xl font-bold">{turma.nome}</div>
-          <div className="text-[13.5px] text-text-secondary">{turma.totalAlunos} alunos · turno {turma.turno} · Eixo de Tecnologia da Informação</div>
+          <div className="text-xl font-bold">{rotuloTurma}</div>
+          <div className="text-[13.5px] text-text-secondary">
+            {alunos.length} {alunos.length === 1 ? 'aluno' : 'alunos'}
+            {turma.cursos?.eixos?.nome && ` · Eixo de ${turma.cursos.eixos.nome}`}
+          </div>
         </div>
 
         {emAlerta.length > 0 && (
@@ -72,29 +142,32 @@ export function PainelDiretorPage() {
           <div className="rounded-[10px] border border-border bg-bg p-5">
             <div className="mb-1 text-[14.5px] font-bold">Alunos por peso acumulado</div>
             <div className="mb-3.5 text-xs text-text-secondary">Soma de peso das ocorrências nos últimos 30 dias</div>
-            <div className="flex flex-col">
-              {ranking.map((r, i) => (
-                <button
-                  key={r.aluno.id}
-                  onClick={() => navigate(`/app/aluno/${r.aluno.id}`)}
-                  className={`flex items-center justify-between gap-3 py-2.5 text-left ${i !== 0 ? 'border-t border-border' : ''}`}
-                >
-                  <div className="flex min-w-0 items-center gap-2.5">
-                    <Avatar iniciais={r.aluno.iniciais} cor={r.aluno.avatarColor} tamanho={32} />
-                    <span className="truncate text-[13.5px] font-semibold">{r.aluno.nome}</span>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3">
-                    <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-bg-section sm:block">
-                      <div className="h-full rounded-full" style={{ width: `${(r.peso / maiorPeso) * 100}%`, background: STATUS_COR[r.status] }} />
+            {ranking.length === 0 ? (
+              <EmptyState titulo="Nenhum aluno cadastrado nesta turma ainda" icone={<IconBell size={18} />} />
+            ) : (
+              <div className="flex flex-col">
+                {ranking.map((r, i) => (
+                  <div
+                    key={r.aluno.id}
+                    className={`flex items-center justify-between gap-3 py-2.5 ${i !== 0 ? 'border-t border-border' : ''}`}
+                  >
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <Avatar iniciais={r.aluno.iniciais} cor={r.aluno.avatar_color} tamanho={32} />
+                      <span className="truncate text-[13.5px] font-semibold">{r.aluno.nome}</span>
                     </div>
-                    <span className="rounded-md px-2 py-0.5 text-[11.5px] font-bold" style={{ color: STATUS_COR[r.status], background: `${STATUS_COR[r.status]}14` }}>
-                      {STATUS_LABEL[r.status]}
-                    </span>
-                    <span className="w-5 text-right text-sm font-bold">{r.peso}</span>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-bg-section sm:block">
+                        <div className="h-full rounded-full" style={{ width: `${(r.peso / maiorPeso) * 100}%`, background: STATUS_COR[r.status] }} />
+                      </div>
+                      <span className="rounded-md px-2 py-0.5 text-[11.5px] font-bold" style={{ color: STATUS_COR[r.status], background: `${STATUS_COR[r.status]}14` }}>
+                        {STATUS_LABEL[r.status]}
+                      </span>
+                      <span className="w-5 text-right text-sm font-bold">{r.peso}</span>
+                    </div>
                   </div>
-                </button>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">

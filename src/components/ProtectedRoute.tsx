@@ -10,8 +10,8 @@ export function ProtectedRoute() {
 
 const PAGINA_INICIAL: Record<string, string> = {
   admin: '/app/administracao',
-  professor: '/app/meus-registros',
-  professor_tecnico: '/app/meus-registros',
+  professor: '/app/painel',
+  professor_tecnico: '/app/painel',
   professor_diretor: '/app/minha-turma',
   professor_coordenador: '/app/meu-eixo',
   coordenacao_pedagogica: '/app/visao-geral',

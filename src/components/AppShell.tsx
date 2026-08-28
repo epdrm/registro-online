@@ -31,15 +31,22 @@ interface NavItem {
 function navPorPapel(papel: string, naoLidas: number): NavItem[] {
   if (papel === 'admin') {
     return [
-      { to: '/app/administracao', label: 'Professores', icon: IconUsers },
+      { to: '/app/administracao', label: 'Painel', icon: IconBarChart },
+      { to: '/app/professores', label: 'Professores', icon: IconUsers },
       { to: '/app/cursos', label: 'Cursos', icon: IconGrid },
     ]
   }
 
-  const base: NavItem[] = [
+  const base: NavItem[] = []
+
+  if (papel === 'professor' || papel === 'professor_tecnico') {
+    base.push({ to: '/app/painel', label: 'Painel', icon: IconBarChart })
+  }
+
+  base.push(
     { to: '/app/novo-registro', label: 'Novo registro', icon: IconPlus },
     { to: '/app/meus-registros', label: 'Meus registros', icon: IconClipboard },
-  ]
+  )
 
   if (papel === 'professor_diretor') {
     base.push({ to: '/app/minha-turma', label: 'Minha turma', icon: IconLayers })
