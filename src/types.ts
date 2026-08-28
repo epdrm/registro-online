@@ -10,11 +10,13 @@ export type Papel =
 export interface Usuario {
   id: string
   nome: string
+  username: string
   email: string
   iniciais: string
   avatarColor: string
   papel: Papel
-  disciplina?: string
+  /** Disciplinas que leciona — um professor pode dar aula em mais de uma. */
+  disciplinas?: string[]
   /** professor_diretor: turma pela qual é responsável */
   turmaResponsavelId?: string
   /** professor_coordenador: eixo que coordena */

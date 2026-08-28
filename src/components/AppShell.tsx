@@ -12,8 +12,8 @@ const ROTULO_PAPEL: Record<string, string> = {
   admin: 'Administrador(a)',
   professor: 'Professor(a)',
   professor_tecnico: 'Professor(a) técnico(a)',
-  professor_diretor: 'Professor(a)-diretor(a)',
-  professor_coordenador: 'Professor(a) coordenador(a)',
+  professor_diretor: 'Diretor(a) de Turma',
+  professor_coordenador: 'Coordenação técnica',
   coordenacao_pedagogica: 'Coordenação pedagógica',
   diretor: 'Direção escolar',
 }
@@ -30,13 +30,23 @@ interface NavItem {
 
 function navPorPapel(papel: string, naoLidas: number): NavItem[] {
   if (papel === 'admin') {
-    return [{ to: '/app/administracao', label: 'Professores', icon: IconUsers }]
+    return [
+      { to: '/app/administracao', label: 'Painel', icon: IconBarChart },
+      { to: '/app/professores', label: 'Professores', icon: IconUsers },
+      { to: '/app/cursos', label: 'Cursos', icon: IconGrid },
+    ]
   }
 
-  const base: NavItem[] = [
+  const base: NavItem[] = []
+
+  if (papel === 'professor' || papel === 'professor_tecnico') {
+    base.push({ to: '/app/painel', label: 'Painel', icon: IconBarChart })
+  }
+
+  base.push(
     { to: '/app/novo-registro', label: 'Novo registro', icon: IconPlus },
     { to: '/app/meus-registros', label: 'Meus registros', icon: IconClipboard },
-  ]
+  )
 
   if (papel === 'professor_diretor') {
     base.push({ to: '/app/minha-turma', label: 'Minha turma', icon: IconLayers })
@@ -111,7 +121,8 @@ export function AppShell({ children, titulo }: { children: ReactNode; titulo: st
           <div className="min-w-0">
             <div className="truncate text-[13.5px] font-semibold">{usuario.nome}</div>
             <div className="truncate text-xs text-text-secondary">
-              {ROTULO_PAPEL[usuario.papel]}{!OCULTAR_DISCIPLINA.has(usuario.papel) && ` · ${usuario.disciplina}`}
+              {ROTULO_PAPEL[usuario.papel]}
+              {!OCULTAR_DISCIPLINA.has(usuario.papel) && !!usuario.disciplinas?.length && ` · ${usuario.disciplinas.join(', ')}`}
             </div>
           </div>
           <button
@@ -170,16 +181,18 @@ export function AppShell({ children, titulo }: { children: ReactNode; titulo: st
             <div className="text-[17px] font-bold sm:text-[18px]">{titulo}</div>
           </div>
           <div className="flex items-center gap-2.5 sm:gap-4">
-            <NavLink
-              to="/app/notificacoes"
-              className="tap-target relative hidden items-center justify-center rounded-lg text-text-secondary hover:bg-bg-section sm:flex"
-              aria-label="Notificações"
-            >
-              <IconBell size={19} />
-              {naoLidas > 0 && (
-                <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full border border-bg bg-grave" />
-              )}
-            </NavLink>
+            {usuario.papel !== 'admin' && (
+              <NavLink
+                to="/app/notificacoes"
+                className="tap-target relative hidden items-center justify-center rounded-lg text-text-secondary hover:bg-bg-section sm:flex"
+                aria-label="Notificações"
+              >
+                <IconBell size={19} />
+                {naoLidas > 0 && (
+                  <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full border border-bg bg-grave" />
+                )}
+              </NavLink>
+            )}
             {usuario.papel !== 'admin' && (
               <button
                 onClick={() => navigate('/app/novo-registro')}

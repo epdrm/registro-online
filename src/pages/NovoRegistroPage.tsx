@@ -35,6 +35,7 @@ export function NovoRegistroPage() {
   const [descricao, setDescricao] = useState('')
   const [anexo, setAnexo] = useState<string | null>(null)
   const [salvo, setSalvo] = useState(false)
+  const [disciplina, setDisciplina] = useState(usuario?.disciplinas?.[0] ?? '')
 
   const alunosDaTurma = useMemo(
     () => ALUNOS.filter((a) => a.turmaId === turmaId && a.nome.toLowerCase().includes(busca.toLowerCase())),
@@ -57,7 +58,7 @@ export function NovoRegistroPage() {
     adicionarRegistro({
       alunoIds,
       turmaId,
-      disciplina: usuario.disciplina ?? '',
+      disciplina,
       autorId: usuario.id,
       categoriaId,
       descricao: descricao.trim() || 'Sem descrição adicional.',
@@ -71,8 +72,22 @@ export function NovoRegistroPage() {
   return (
     <AppShell titulo="Novo registro">
       <div className="mx-auto flex w-full max-w-[680px] flex-col gap-7 px-4 py-7 sm:px-7">
-        <div className="text-[13px] text-text-secondary">
-          Preencha em poucos passos — leva menos de um minuto. Registrado como <strong className="text-text">{usuario.nome}</strong>, {usuario.disciplina}.
+        <div className="flex flex-col gap-2 text-[13px] text-text-secondary sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            Preencha em poucos passos — leva menos de um minuto. Registrado como <strong className="text-text">{usuario.nome}</strong>.
+          </div>
+          {!!usuario.disciplinas?.length && (
+            <label className="flex shrink-0 items-center gap-2">
+              <span className="font-semibold text-text">Disciplina</span>
+              <select
+                value={disciplina}
+                onChange={(e) => setDisciplina(e.target.value)}
+                className="tap-target rounded-lg border border-border bg-bg px-2.5 text-[13px] outline-none focus:border-green"
+              >
+                {usuario.disciplinas.map((d) => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </label>
+          )}
         </div>
 
         {/* 1. Turma */}

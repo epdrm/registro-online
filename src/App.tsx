@@ -9,6 +9,9 @@ import { PainelDirecaoPage } from './pages/PainelDirecaoPage'
 import { PerfilAlunoPage } from './pages/PerfilAlunoPage'
 import { NotificacoesPage } from './pages/NotificacoesPage'
 import { AdministracaoPage } from './pages/AdministracaoPage'
+import { CursosPage } from './pages/CursosPage'
+import { ProfessoresPage } from './pages/ProfessoresPage'
+import { PainelProfessorPage } from './pages/PainelProfessorPage'
 
 export default function App() {
   return (
@@ -18,6 +21,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/app" element={<RedirecionarInicio />} />
+        <Route path="/app/painel" element={<PainelProfessorPage />} />
         <Route path="/app/novo-registro" element={<NovoRegistroPage />} />
         <Route path="/app/meus-registros" element={<MeusRegistrosPage />} />
         <Route path="/app/minha-turma" element={<PainelDiretorPage />} />
@@ -26,6 +30,8 @@ export default function App() {
         <Route path="/app/notificacoes" element={<NotificacoesPage />} />
         <Route path="/app/aluno/:alunoId" element={<PerfilAlunoPage />} />
         <Route path="/app/administracao" element={<AdministracaoPage />} />
+        <Route path="/app/professores" element={<ProfessoresPage />} />
+        <Route path="/app/cursos" element={<CursosPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

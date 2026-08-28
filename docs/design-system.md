@@ -1,5 +1,4 @@
-Crie o design de um sistema web responsivo chamado **Registro Online**, usado por uma
-escola técnica estadual para registrar e acompanhar ocorrências de alunos.
+Este é o design do sistema web responsivo chamado **Registro Online**, usado para registrar e acompanhar ocorrências de alunos.
 
 ## Contexto
 

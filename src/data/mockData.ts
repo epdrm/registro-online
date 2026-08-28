@@ -73,30 +73,30 @@ export function categoriaPorId(id: string): Categoria | undefined {
 
 export const USUARIOS: Usuario[] = [
   {
-    id: 'marina', nome: 'Marina Alves Ferreira', email: 'marina.ferreira@escolavaleverde.edu.br',
-    iniciais: 'MF', avatarColor: '#5C6661', papel: 'professor', disciplina: 'Matemática',
+    id: 'marina', nome: 'Marina Alves Ferreira', username: 'marina.ferreira', email: 'marina.ferreira@interno.escola',
+    iniciais: 'MF', avatarColor: '#5C6661', papel: 'professor', disciplinas: ['Matemática'],
   },
   {
-    id: 'carlos', nome: 'Carlos Eduardo Lima', email: 'carlos.lima@escolavaleverde.edu.br',
-    iniciais: 'CL', avatarColor: '#16794C', papel: 'professor_tecnico', disciplina: 'Redes de Computadores',
+    id: 'carlos', nome: 'Carlos Eduardo Lima', username: 'carlos.lima', email: 'carlos.lima@interno.escola',
+    iniciais: 'CL', avatarColor: '#16794C', papel: 'professor_tecnico', disciplinas: ['Redes de Computadores'],
   },
   {
-    id: 'renata', nome: 'Renata Souza Prado', email: 'renata.prado@escolavaleverde.edu.br',
-    iniciais: 'RP', avatarColor: '#0F5138', papel: 'professor_diretor', disciplina: 'Física',
+    id: 'renata', nome: 'Renata Souza Prado', username: 'renata.prado', email: 'renata.prado@interno.escola',
+    iniciais: 'RP', avatarColor: '#0F5138', papel: 'professor_diretor', disciplinas: ['Física'],
     turmaResponsavelId: 'ds-2',
   },
   {
-    id: 'paulo', nome: 'Paulo Henrique Costa', email: 'paulo.costa@escolavaleverde.edu.br',
-    iniciais: 'PC', avatarColor: '#0F5138', papel: 'professor_coordenador', disciplina: 'Programação',
+    id: 'paulo', nome: 'Paulo Henrique Costa', username: 'paulo.costa', email: 'paulo.costa@interno.escola',
+    iniciais: 'PC', avatarColor: '#0F5138', papel: 'professor_coordenador', disciplinas: ['Programação'],
     eixoCoordenadoId: 'ti',
   },
   {
-    id: 'luciana', nome: 'Luciana Martins Rocha', email: 'luciana.rocha@escolavaleverde.edu.br',
-    iniciais: 'LR', avatarColor: '#0F5138', papel: 'coordenacao_pedagogica', disciplina: 'Coordenação pedagógica',
+    id: 'luciana', nome: 'Luciana Martins Rocha', username: 'luciana.rocha', email: 'luciana.rocha@interno.escola',
+    iniciais: 'LR', avatarColor: '#0F5138', papel: 'coordenacao_pedagogica', disciplinas: ['Coordenação pedagógica'],
   },
   {
-    id: 'fabio', nome: 'Fábio Antunes Rezende', email: 'fabio.rezende@escolavaleverde.edu.br',
-    iniciais: 'FR', avatarColor: '#0F5138', papel: 'diretor', disciplina: 'Direção escolar',
+    id: 'fabio', nome: 'Fábio Antunes Rezende', username: 'fabio.rezende', email: 'fabio.rezende@interno.escola',
+    iniciais: 'FR', avatarColor: '#0F5138', papel: 'diretor', disciplinas: ['Direção escolar'],
   },
 ]
 
