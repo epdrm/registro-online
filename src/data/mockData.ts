@@ -62,9 +62,11 @@ export const CATEGORIAS: Categoria[] = [
   { id: 'entrega', nome: 'Não entrega de atividade', peso: 'leve', pesoNumero: 1 },
   { id: 'ausencia', nome: 'Ausência / atraso', peso: 'leve', pesoNumero: 1 },
   { id: 'celular', nome: 'Uso indevido de celular', peso: 'moderada', pesoNumero: 3 },
+  { id: 'fardamento', nome: 'Fardamento indevido', peso: 'moderada', pesoNumero: 3 },
   { id: 'patrimonio', nome: 'Dano ao patrimônio', peso: 'grave', pesoNumero: 5 },
-  { id: 'conflito', nome: 'Conflito entre alunos', peso: 'grave', pesoNumero: 5 },
+  { id: 'conflito', nome: 'Conflito entre alunos/professores', peso: 'grave', pesoNumero: 5 },
   { id: 'elogio', nome: 'Elogio / destaque positivo', peso: 'positiva', pesoNumero: 0 },
+  { id: 'outro', nome: 'Outro', peso: 'leve', pesoNumero: 1 },
 ]
 
 export function categoriaPorId(id: string): Categoria | undefined {

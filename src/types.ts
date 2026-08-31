@@ -69,6 +69,10 @@ export interface Registro {
   disciplina: string
   autorId: string
   categoriaId: string
+  /** Título obrigatório do ocorrido — usado quando categoriaId === 'outro'. */
+  titulo?: string
+  /** Peso escolhido pelo professor (1 a 5) — usado quando categoriaId === 'outro', substituindo o peso fixo da categoria. */
+  pesoNumero?: number
   descricao: string
   dataHora: string // ISO
   status: StatusTratativa

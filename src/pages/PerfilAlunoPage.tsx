@@ -6,8 +6,8 @@ import { EmptyState } from '../components/EmptyState'
 import { PesoBadge } from '../components/PesoBadge'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
-import { alunoPorId, categoriaPorId, turmaPorId, usuarioPorId } from '../data/mockData'
-import { pesoAcumuladoAluno, registrosDoAluno, statusPeso } from '../data/selectors'
+import { alunoPorId, turmaPorId, usuarioPorId } from '../data/mockData'
+import { categoriaEfetivaDoRegistro, pesoAcumuladoAluno, registrosDoAluno, statusPeso } from '../data/selectors'
 import { formatarDataHora } from '../utils/date'
 import { IconChevronLeft, IconClipboard } from '../components/icons'
 
@@ -125,16 +125,15 @@ export function PerfilAlunoPage() {
           ) : (
             <div className="flex flex-col">
               {registrosDoHistorico.map((r, i) => {
-                const categoria = categoriaPorId(r.categoriaId)
+                const efetiva = categoriaEfetivaDoRegistro(r)
                 const autor = usuarioPorId(r.autorId)
-                if (!categoria) return null
                 return (
                   <div key={r.id} className={`flex gap-3 py-3.5 ${i !== 0 ? 'border-t border-border' : ''}`}>
-                    <div className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: { leve: '#B98900', moderada: '#C2601C', grave: '#B3261E', positiva: '#16794C' }[categoria.peso] }} />
+                    <div className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: { leve: '#B98900', moderada: '#C2601C', grave: '#B3261E', positiva: '#16794C' }[efetiva.peso] }} />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[13.5px] font-semibold">{categoria.nome}</span>
-                        <PesoBadge peso={categoria.peso} pesoNumero={categoria.pesoNumero} />
+                        <span className="text-[13.5px] font-semibold">{efetiva.nome}</span>
+                        <PesoBadge peso={efetiva.peso} pesoNumero={efetiva.pesoNumero} />
                       </div>
                       <p className="mt-1 text-[13.5px] text-text-secondary">{r.descricao}</p>
                       <div className="mt-1.5 text-xs text-text-secondary">
