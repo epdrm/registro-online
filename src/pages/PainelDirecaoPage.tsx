@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react'
 import { AppShell } from '../components/AppShell'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
-import { CURSOS, EIXOS, categoriaPorId, cursoPorId, usuarioPorId } from '../data/mockData'
-import { rankingTurmas, turmasSemOcorrencia, LIMIAR_ACUMULO, rankingAlunosDaTurma } from '../data/selectors'
+import { CURSOS, EIXOS, cursoPorId, usuarioPorId } from '../data/mockData'
+import { categoriaEfetivaDoRegistro, rankingTurmas, turmasSemOcorrencia, LIMIAR_ACUMULO, rankingAlunosDaTurma } from '../data/selectors'
 import { TURMAS } from '../data/mockData'
 import { formatarDataHora } from '../utils/date'
 import { PesoBadge } from '../components/PesoBadge'
@@ -131,18 +131,17 @@ export function PainelDirecaoPage() {
             <div className="mb-3.5 text-xs text-text-secondary">Identificação por turma — nomes ficam no perfil do aluno</div>
             <div className="flex flex-col">
               {timeline.map((r, i) => {
-                const categoria = categoriaPorId(r.categoriaId)
+                const efetiva = categoriaEfetivaDoRegistro(r)
                 const autor = usuarioPorId(r.autorId)
                 const turmaNome = TURMAS.find((t) => t.id === r.turmaId)?.nome
-                if (!categoria) return null
                 return (
                   <div key={r.id} className={`flex gap-2.5 py-2.5 ${i !== 0 ? 'border-t border-border' : ''}`}>
-                    <div className="mt-2 h-2 w-2 shrink-0 rounded-full" style={{ background: { leve: '#B98900', moderada: '#C2601C', grave: '#B3261E', positiva: '#16794C' }[categoria.peso] }} />
+                    <div className="mt-2 h-2 w-2 shrink-0 rounded-full" style={{ background: { leve: '#B98900', moderada: '#C2601C', grave: '#B3261E', positiva: '#16794C' }[efetiva.peso] }} />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-text">
                         <strong>{turmaNome}</strong>
-                        <span>· {categoria.nome}</span>
-                        <PesoBadge peso={categoria.peso} pesoNumero={categoria.pesoNumero} />
+                        <span>· {efetiva.nome}</span>
+                        <PesoBadge peso={efetiva.peso} pesoNumero={efetiva.pesoNumero} />
                       </div>
                       <div className="mt-0.5 text-xs text-text-secondary">{formatarDataHora(r.dataHora)} · registrado por {autor?.nome ?? 'sistema'}</div>
                     </div>

@@ -7,8 +7,8 @@ import { PesoBadge } from '../components/PesoBadge'
 import { StatusBadge } from '../components/StatusBadge'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
-import { CATEGORIAS, TURMAS, alunoPorId, categoriaPorId, turmaPorId } from '../data/mockData'
-import { registrosDoAutor } from '../data/selectors'
+import { CATEGORIAS, TURMAS, alunoPorId, turmaPorId } from '../data/mockData'
+import { categoriaEfetivaDoRegistro, registrosDoAutor } from '../data/selectors'
 import { formatarDataHora, diasEntre } from '../utils/date'
 import { IconClipboard, IconSearch } from '../components/icons'
 
@@ -112,9 +112,9 @@ export function MeusRegistrosPage() {
               </div>
               {filtrados.map((r, i) => {
                 const aluno = alunoPorId(r.alunoIds[0])
-                const categoria = categoriaPorId(r.categoriaId)
+                const efetiva = categoriaEfetivaDoRegistro(r)
                 const turma = turmaPorId(r.turmaId)
-                if (!aluno || !categoria) return null
+                if (!aluno) return null
                 return (
                   <button
                     key={r.id}
@@ -128,7 +128,7 @@ export function MeusRegistrosPage() {
                       </span>
                     </div>
                     <div className="text-[13.5px] text-text-secondary">{turma?.nome}</div>
-                    <div><PesoBadge peso={categoria.peso} pesoNumero={categoria.pesoNumero} className="max-w-full truncate" /></div>
+                    <div><PesoBadge peso={efetiva.peso} pesoNumero={efetiva.pesoNumero} className="max-w-full truncate" /></div>
                     <div className="text-[13px] text-text-secondary">{formatarDataHora(r.dataHora)}</div>
                     <div><StatusBadge status={r.status} /></div>
                   </button>

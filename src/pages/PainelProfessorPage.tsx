@@ -6,8 +6,8 @@ import { EmptyState } from '../components/EmptyState'
 import { PesoBadge } from '../components/PesoBadge'
 import { useAuth } from '../context/AuthContext'
 import { useData } from '../context/DataContext'
-import { alunoPorId, categoriaPorId, turmaPorId } from '../data/mockData'
-import { registrosDoAutor } from '../data/selectors'
+import { alunoPorId, turmaPorId } from '../data/mockData'
+import { categoriaEfetivaDoRegistro, pesoDoRegistro, registrosDoAutor } from '../data/selectors'
 import { formatarDataHora, diasEntre } from '../utils/date'
 import { IconClipboard, IconPlus } from '../components/icons'
 
@@ -18,7 +18,7 @@ export function PainelProfessorPage() {
 
   const meusRegistros = useMemo(() => (usuario ? registrosDoAutor(usuario.id, registros) : []), [usuario, registros])
   const noMes = useMemo(() => meusRegistros.filter((r) => diasEntre(r.dataHora) <= 30), [meusRegistros])
-  const graves = useMemo(() => noMes.filter((r) => categoriaPorId(r.categoriaId)?.pesoNumero === 5), [noMes])
+  const graves = useMemo(() => noMes.filter((r) => pesoDoRegistro(r) === 5), [noMes])
   const alunosUnicos = useMemo(() => new Set(noMes.flatMap((r) => r.alunoIds)).size, [noMes])
   const recentes = meusRegistros.slice(0, 6)
 
@@ -78,9 +78,9 @@ export function PainelProfessorPage() {
             <div className="flex flex-col divide-y divide-border">
               {recentes.map((r) => {
                 const aluno = alunoPorId(r.alunoIds[0])
-                const categoria = categoriaPorId(r.categoriaId)
+                const efetiva = categoriaEfetivaDoRegistro(r)
                 const turma = turmaPorId(r.turmaId)
-                if (!aluno || !categoria) return null
+                if (!aluno) return null
                 return (
                   <button
                     key={r.id}
@@ -94,7 +94,7 @@ export function PainelProfessorPage() {
                       </div>
                       <div className="truncate text-xs text-text-secondary">{turma?.nome} · {formatarDataHora(r.dataHora)}</div>
                     </div>
-                    <PesoBadge peso={categoria.peso} pesoNumero={categoria.pesoNumero} className="shrink-0" />
+                    <PesoBadge peso={efetiva.peso} pesoNumero={efetiva.pesoNumero} className="shrink-0" />
                   </button>
                 )
               })}

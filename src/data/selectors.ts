@@ -1,4 +1,4 @@
-import type { Aluno, Categoria, Notificacao, Registro, Turma } from '../types'
+import type { Aluno, Categoria, Notificacao, PesoTipo, Registro, Turma } from '../types'
 import { ALUNOS, CATEGORIAS, CURSOS, TURMAS, categoriaPorId } from './mockData'
 import { diasEntre } from '../utils/date'
 
@@ -9,8 +9,34 @@ export function registrosDentroDaJanela(registros: Registro[], dias = JANELA_ACU
   return registros.filter((r) => diasEntre(r.dataHora) <= dias)
 }
 
+/** Classifica um peso numérico (1 a 5, usado na categoria "Outro") no mesmo bucket visual das categorias fixas. */
+export function pesoTipoDoNumero(n: number): PesoTipo {
+  if (n >= 5) return 'grave'
+  if (n >= 3) return 'moderada'
+  return 'leve'
+}
+
+export interface CategoriaEfetiva {
+  nome: string
+  peso: PesoTipo
+  pesoNumero: number
+}
+
+/**
+ * Nome/peso "reais" de um registro para exibição — para a categoria "Outro" o peso é o
+ * escolhido pelo professor (1 a 5) e o nome é o título digitado, não o rótulo fixo da categoria.
+ */
+export function categoriaEfetivaDoRegistro(r: Registro): CategoriaEfetiva {
+  if (r.categoriaId === 'outro') {
+    const numero = r.pesoNumero ?? 1
+    return { nome: r.titulo?.trim() || 'Outro', peso: pesoTipoDoNumero(numero), pesoNumero: numero }
+  }
+  const categoria = categoriaPorId(r.categoriaId)
+  return { nome: categoria?.nome ?? 'Categoria', peso: categoria?.peso ?? 'leve', pesoNumero: categoria?.pesoNumero ?? 0 }
+}
+
 export function pesoDoRegistro(r: Registro): number {
-  return categoriaPorId(r.categoriaId)?.pesoNumero ?? 0
+  return categoriaEfetivaDoRegistro(r).pesoNumero
 }
 
 /** Peso acumulado de um aluno nos últimos `dias` (padrão 30), somando todos os registros em que ele aparece. */
